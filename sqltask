@@ -1,0 +1,231 @@
+1. Salary greater than average salary
+SELECT * 
+FROM Emp
+WHERE Salary > (SELECT AVG(Salary) FROM Emp);
+
+2. Age less than youngest employee in HR
+SELECT * 
+FROM Emp
+WHERE Age < (SELECT MIN(Age) FROM Emp WHERE Department = 'HR');
+
+3. Employees living in same city as Ravi
+SELECT * 
+FROM Emp
+WHERE City = (SELECT City FROM Emp WHERE Name = 'Ravi');
+
+4. Employees with same salary as Karan
+SELECT * 
+FROM Emp
+WHERE Salary = (SELECT Salary FROM Emp WHERE Name = 'Karan');
+
+5. Employees earning more than Sneha
+SELECT * 
+FROM Emp
+WHERE Salary > (SELECT Salary FROM Emp WHERE Name = 'Sneha');
+
+6. Employees in same department as Nisha
+SELECT * 
+FROM Emp
+WHERE Department = (SELECT Department FROM Emp WHERE Name = 'Nisha');
+
+7. Employees living in cities of Finance employees
+SELECT * 
+FROM Emp
+WHERE City IN (SELECT City FROM Emp WHERE Department = 'Finance');
+
+8. Employees older than any Sales employee
+SELECT * 
+FROM Emp
+WHERE Age > (SELECT MIN(Age) FROM Emp WHERE Department = 'Sales');
+
+9. Employees earning more than all HR employees
+SELECT * 
+FROM Emp
+WHERE Salary > (SELECT MAX(Salary) FROM Emp WHERE Department = 'HR');
+
+10. Employees in departments where someone earns > 70000
+SELECT * 
+FROM Emp
+WHERE Department IN (
+    SELECT Department FROM Emp WHERE Salary > 70000
+);
+
+🔹 CORRELATED SUB QUERIES
+11. Salary > average salary of their department
+SELECT * 
+FROM Emp e
+WHERE Salary > (
+    SELECT AVG(Salary)
+    FROM Emp
+    WHERE Department = e.Department
+);
+
+12. Maximum salary in each department
+SELECT * 
+FROM Emp e
+WHERE Salary = (
+    SELECT MAX(Salary)
+    FROM Emp
+    WHERE Department = e.Department
+);
+
+13. Minimum salary in each department
+SELECT * 
+FROM Emp e
+WHERE Salary = (
+    SELECT MIN(Salary)
+    FROM Emp
+    WHERE Department = e.Department
+);
+
+14. Age greater than department average age
+SELECT * 
+FROM Emp e
+WHERE Age > (
+    SELECT AVG(Age)
+    FROM Emp
+    WHERE Department = e.Department
+);
+
+15. Same city as at least one colleague in same department
+SELECT * 
+FROM Emp e
+WHERE City IN (
+    SELECT City
+    FROM Emp
+    WHERE Department = e.Department
+      AND EmpID <> e.EmpID
+);
+
+16. City with maximum number of employees
+SELECT City
+FROM Emp
+GROUP BY City
+HAVING COUNT(*) = (
+    SELECT MAX(cnt)
+    FROM (
+        SELECT COUNT(*) cnt
+        FROM Emp
+        GROUP BY City
+    ) t
+);
+
+🔹 NESTED SUB QUERIES
+17. Second-highest salary
+SELECT * 
+FROM Emp
+WHERE Salary = (
+    SELECT MAX(Salary)
+    FROM Emp
+    WHERE Salary < (SELECT MAX(Salary) FROM Emp)
+);
+
+18. Third-highest salary
+SELECT * 
+FROM Emp
+WHERE Salary = (
+    SELECT MAX(Salary)
+    FROM Emp
+    WHERE Salary < (
+        SELECT MAX(Salary)
+        FROM Emp
+        WHERE Salary < (SELECT MAX(Salary) FROM Emp)
+    )
+);
+
+19. Salary > average salary of Delhi employees
+SELECT * 
+FROM Emp
+WHERE Salary > (
+    SELECT AVG(Salary)
+    FROM Emp
+    WHERE City = 'Delhi'
+);
+
+20. Salary > average salary of employees older than 30
+SELECT * 
+FROM Emp
+WHERE Salary > (
+    SELECT AVG(Salary)
+    FROM Emp
+    WHERE Age > 30
+);
+
+21. Younger than oldest Sales employee
+SELECT * 
+FROM Emp
+WHERE Age < (
+    SELECT MAX(Age)
+    FROM Emp
+    WHERE Department = 'Sales'
+);
+
+22. Salary > avg Finance & < max IT
+SELECT * 
+FROM Emp
+WHERE Salary > (
+    SELECT AVG(Salary)
+    FROM Emp
+    WHERE Department = 'Finance'
+)
+AND Salary < (
+    SELECT MAX(Salary)
+    FROM Emp
+    WHERE Department = 'IT'
+);
+
+23. Employees from department with least employees
+SELECT * 
+FROM Emp
+WHERE Department = (
+    SELECT Department
+    FROM Emp
+    GROUP BY Department
+    HAVING COUNT(*) = (
+        SELECT MIN(cnt)
+        FROM (
+            SELECT COUNT(*) cnt
+            FROM Emp
+            GROUP BY Department
+        ) t
+    )
+);
+
+24. Employees from cities having more employees than Priya’s city
+SELECT * 
+FROM Emp
+WHERE City IN (
+    SELECT City
+    FROM Emp
+    GROUP BY City
+    HAVING COUNT(*) >
+        (SELECT COUNT(*)
+         FROM Emp
+         WHERE City = (SELECT City FROM Emp WHERE Name = 'Priya'))
+);
+
+25. Employees from departments with avg salary > 55000
+SELECT * 
+FROM Emp
+WHERE Department IN (
+    SELECT Department
+    FROM Emp
+    GROUP BY Department
+    HAVING AVG(Salary) > 55000
+);
+
+26. Salary > company avg but < department max
+SELECT * 
+FROM Emp e
+WHERE Salary > (SELECT AVG(Salary) FROM Emp)
+AND Salary < (
+    SELECT MAX(Salary)
+    FROM Emp
+    WHERE Department = e.Department
+);
+
+27. Salary above avg & age below avg
+SELECT * 
+FROM Emp
+WHERE Salary > (SELECT AVG(Salary) FROM Emp)
+AND Age < (SELECT AVG(Age) FROM Emp);
